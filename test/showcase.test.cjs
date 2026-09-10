@@ -16,7 +16,7 @@ async function waitFor(check, timeout = 15000) {
   throw new Error('Timed out waiting for demo');
 }
 
-test('real multi-process cascades and Sentry envelopes', { timeout: 60000 }, async t => {
+test('real multi-process cascades and Sentry envelopes', { timeout: 120000 }, async t => {
   const envelopes = [];
   const receiver = http.createServer((req, res) => {
     const chunks = [];
@@ -55,7 +55,7 @@ test('real multi-process cascades and Sentry envelopes', { timeout: 60000 }, asy
     await waitFor(async () => {
       const health = await (await fetch(`${base}/api/health`)).json();
       return health.services.every(service => service.status === 'ok');
-    });
+    }, 60000);
   } catch (error) { throw new Error(`${error.message}\n${output}`); }
   assert.match(await (await fetch(base)).text(), /Pokétrace/);
   assert.equal((await fetch(`${base}/api/run/unknown`, { method: 'POST' })).status, 400);

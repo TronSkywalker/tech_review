@@ -120,7 +120,7 @@ Choose **Come full circle** on the dashboard and select a starting Pokémon. Or 
 
 Each Pokémon randomly chooses any other Pokémon and makes a real HTTP call. Intermediate Pokémon can repeat. When the starting Pokémon is called again, it records `loop.closed: true` and returns without making another call. The response tree includes that final repeated Pokémon, and its `loop.path` contains the full route. Each hop and loop closure also emit structured Sentry logs in the same distributed trace.
 
-After 20 visits without returning, the next call is forced back to the origin (at most 21 service calls including closure). A dependency failure ends the request with an error tree. This bounds the demonstration while preserving a real loop such as `eevee → gengar → squirtle → eevee`.
+After 20 visits without returning, the next call is forced back to the origin (at most 21 service calls including closure). Loop dependency calls have a 30-second timeout to allow the nested chain to finish; other scenarios keep their six-second timeout. A dependency failure ends the request with an error tree. This bounds the demonstration while preserving a real loop such as `eevee → gengar → squirtle → eevee`.
 
 ```powershell
 Invoke-RestMethod -Method Post http://localhost:3000/api/run/loop -ContentType 'application/json' -Body '{"service":"eevee"}'

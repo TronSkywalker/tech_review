@@ -28,7 +28,7 @@ async function callService(target, scenario, requestId, loopPath) {
       const url = new URL(`${serviceUrl(target)}/work/${scenario}`);
       if (loopPath) url.searchParams.set('path', loopPath.join(','));
       const response = await fetch(url, {
-        headers: { 'x-demo-request-id': requestId }, signal: AbortSignal.timeout(6000),
+        headers: { 'x-demo-request-id': requestId }, signal: AbortSignal.timeout(scenario === 'loop' ? 30000 : 6000),
       });
       return await response.json();
     } catch (error) {
