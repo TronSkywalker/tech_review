@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pokétrace · Sentry showcase</title>
+  <link rel="stylesheet" href="/style.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <header><a class="brand" href="/">◉ <span>pokétrace</span></a><span class="header-note">SENTRY CAPABILITY LAB</span><span id="connection" class="pill">Connecting…</span></header>
+  <main>
+    <section class="intro"><div class="eyebrow">TEN SERVICES. ONE REQUEST.</div><h1>Small services.<br><span>Big picture.</span></h1><p>Send a request into a world of tiny Pokémon services.<br>Follow the cascade, find the slowdown, catch the error.</p></section>
+    <div class="section-heading"><h2><span class="number">01</span> Choose your scenario</h2><span>Real HTTP calls · intentional demo failures</span></div>
+    <section id="scenarios" class="scenarios" aria-label="Demo scenarios"></section>
+    <div class="section-heading"><h2><span class="number">02</span> The service squad</h2><button id="refresh" class="text-button">Refresh status ↻</button></div>
+    <p class="hint">Adapter → Pikachu → three parallel branches → six leaf services. Eevee adds eight calls to Meowth in the repeated-calls scenario.</p>
+    <section id="services" class="services" aria-label="Service health"></section>
+    <section class="results"><div class="section-heading"><h2><span class="number">03</span> Request explorer</h2><span id="run-status" role="status" aria-live="polite">Ready when you are</span></div>
+      <div id="empty" class="empty"><div class="orbit">↗</div><h3>Your next request starts here</h3><p>Run a scenario to see its service calls, timings, and result.</p></div>
+      <div id="result" hidden><div id="metrics" class="metrics"></div><div id="trace" class="trace"></div><div id="tree" class="tree"></div><details><summary>Raw response</summary><pre id="raw"></pre></details></div>
+    </section>
+    <footer><span>POKÉTRACE / TECH REVIEW</span><span>Local demo · Sentry DSNs configured per service</span></footer>
+  </main>
+</body>
+</html>

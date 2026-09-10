@@ -1,0 +1,104 @@
+name: poketrace
+x-common: &common
+  build: .
+  init: true
+  env_file:
+    - path: .env
+      required: false
+  healthcheck:
+    test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:'+process.env.PORT+'/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+    interval: 15s
+    timeout: 3s
+    start_period: 10s
+    retries: 3
+
+services:
+  adapter:
+    <<: *common
+    ports:
+      - "127.0.0.1:3000:3000"
+    environment:
+      SERVICE_NAME: adapter
+      SERVICE_HOST_MODE: docker
+      PORT: "3000"
+    depends_on:
+      pikachu:
+        condition: service_healthy
+      bulbasaur:
+        condition: service_healthy
+      charmander:
+        condition: service_healthy
+      squirtle:
+        condition: service_healthy
+      eevee:
+        condition: service_healthy
+      jigglypuff:
+        condition: service_healthy
+      meowth:
+        condition: service_healthy
+      psyduck:
+        condition: service_healthy
+      snorlax:
+        condition: service_healthy
+      gengar:
+        condition: service_healthy
+  pikachu:
+    <<: *common
+    environment:
+      SERVICE_NAME: pikachu
+      SERVICE_HOST_MODE: docker
+      PORT: "4101"
+  bulbasaur:
+    <<: *common
+    environment:
+      SERVICE_NAME: bulbasaur
+      SERVICE_HOST_MODE: docker
+      PORT: "4102"
+  charmander:
+    <<: *common
+    environment:
+      SERVICE_NAME: charmander
+      SERVICE_HOST_MODE: docker
+      PORT: "4103"
+  squirtle:
+    <<: *common
+    environment:
+      SERVICE_NAME: squirtle
+      SERVICE_HOST_MODE: docker
+      PORT: "4104"
+  eevee:
+    <<: *common
+    environment:
+      SERVICE_NAME: eevee
+      SERVICE_HOST_MODE: docker
+      PORT: "4105"
+  jigglypuff:
+    <<: *common
+    environment:
+      SERVICE_NAME: jigglypuff
+      SERVICE_HOST_MODE: docker
+      PORT: "4106"
+  meowth:
+    <<: *common
+    environment:
+      SERVICE_NAME: meowth
+      SERVICE_HOST_MODE: docker
+      PORT: "4107"
+  psyduck:
+    <<: *common
+    environment:
+      SERVICE_NAME: psyduck
+      SERVICE_HOST_MODE: docker
+      PORT: "4108"
+  snorlax:
+    <<: *common
+    environment:
+      SERVICE_NAME: snorlax
+      SERVICE_HOST_MODE: docker
+      PORT: "4109"
+  gengar:
+    <<: *common
+    environment:
+      SERVICE_NAME: gengar
+      SERVICE_HOST_MODE: docker
+      PORT: "4110"

@@ -1,0 +1,11 @@
+# Also copied beside the upstream Compose file for the official installer.
+services:
+  nginx:
+    networks:
+      default: {}
+      observability:
+        aliases:
+          - sentry
+networks:
+  observability:
+    name: poketrace-observability

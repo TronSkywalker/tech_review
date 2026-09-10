@@ -1,0 +1,9 @@
+# Prepare first: npm run sentry:prepare
+# The official installer must complete before `up`: npm run sentry:install
+name: poketrace-sentry
+include:
+  - path:
+      - ./.sentry/self-hosted/docker-compose.yml
+      - ./infra/sentry/compose.override.yaml
+    project_directory: ./.sentry/self-hosted
+    env_file: ./.sentry/self-hosted/.env.custom

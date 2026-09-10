@@ -1,0 +1,50 @@
+# Start Sentry first: npm run sentry:up
+services:
+  pikachu:
+    networks:
+      - default
+      - observability
+  bulbasaur:
+    networks:
+      - default
+      - observability
+  charmander:
+    networks:
+      - default
+      - observability
+  squirtle:
+    networks:
+      - default
+      - observability
+  eevee:
+    networks:
+      - default
+      - observability
+  jigglypuff:
+    networks:
+      - default
+      - observability
+  meowth:
+    networks:
+      - default
+      - observability
+  psyduck:
+    networks:
+      - default
+      - observability
+  snorlax:
+    networks:
+      - default
+      - observability
+  gengar:
+    networks:
+      - default
+      - observability
+  adapter:
+    networks:
+      - default
+      - observability
+networks:
+  observability:
+    external: true
+    name: poketrace-observability

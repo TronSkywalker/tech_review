@@ -1,0 +1,23 @@
+{
+  "name": "sentry-pokemon-showcase",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Ten tiny services for a hands-on Sentry tech review",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "start": "node --env-file-if-exists=.env scripts/start.cjs",
+    "test": "node --test test/*.test.cjs",
+    "sentry:prepare": "node scripts/sentry.cjs prepare",
+    "sentry:install": "node scripts/sentry.cjs install",
+    "sentry:up": "node scripts/sentry.cjs up",
+    "sentry:down": "node scripts/sentry.cjs down",
+    "sentry:status": "node scripts/sentry.cjs status",
+    "sentry:logs": "node scripts/sentry.cjs logs",
+    "sentry:user": "node scripts/sentry.cjs user",
+    "sentry:config": "node scripts/sentry.cjs config"
+  },
+  "dependencies": {
+    "@sentry/node": "^10.0.0",
+    "express": "^5.1.0"
+  }
+}
