@@ -66,7 +66,14 @@ test('real multi-process cascades and Sentry envelopes', { timeout: 60000 }, asy
     results[scenario.id] = result;
     assert.equal(response.status, scenario.expectedStatus, scenario.id);
     const nodes = flatten(result.tree);
-    assert.equal(nodes.length, scenario.id === 'nplus1' ? 18 : 10);
+    if (scenario.id === 'loop') {
+      assert.ok(nodes.length >= 3 && nodes.length <= 21);
+      assert.equal(nodes[0].service, 'pikachu');
+      assert.equal(nodes.at(-1).service, 'pikachu');
+      assert.equal(nodes.at(-1).loop.closed, true);
+      assert.ok(nodes.slice(1, -1).every(node => node.service !== 'pikachu' && !node.loop.closed));
+      assert.deepEqual(nodes.at(-1).loop.path, nodes.map(node => node.service));
+    } else assert.equal(nodes.length, scenario.id === 'nplus1' ? 18 : 10);
     assert.match(result.traceId, /^[a-f0-9]{32}$/);
     assert.ok(nodes.every(node => node.traceId === result.traceId), `Trace must propagate to every service: ${scenario.id}`);
   }
@@ -75,6 +82,21 @@ test('real multi-process cascades and Sentry envelopes', { timeout: 60000 }, asy
   const handled = flatten(results.handled.tree).find(node => node.service === 'psyduck');
   assert.equal(handled.status, 'warning');
   assert.match(handled.eventId, /^[a-f0-9]{32}$/);
+  const customLoop = await (await fetch(`${base}/api/run/loop`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ service: 'eevee' }) })).json();
+  assert.equal(customLoop.tree.service, 'eevee');
+  assert.equal(flatten(customLoop.tree).at(-1).service, 'eevee');
+  assert.equal((await fetch(`${base}/api/run/loop`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ service: 'missing' }) })).status, 400);
+  const loopUrl = `${env.GENGAR_URL}/work/loop`;
+  assert.equal((await fetch(`${loopUrl}?path=pikachu,missing`)).status, 400);
+  assert.equal((await fetch(`${loopUrl}?path=pikachu,eevee,pikachu`)).status, 400);
+  const longPath = ['pikachu', ...Array.from({ length: 18 }, (_, i) => i % 2 ? 'meowth' : 'eevee')];
+  const bounded = await (await fetch(`${loopUrl}?path=${longPath.join(',')}`)).json();
+  assert.equal(bounded.loop.forcedReturn, true);
+  assert.equal(bounded.children[0].service, 'pikachu');
+  assert.equal(bounded.children[0].loop.closed, true);
+  assert.equal(bounded.children[0].children.length, 0);
+  const direct = await (await fetch(loopUrl)).json();
+  assert.equal(flatten(direct).at(-1).loop.closed, true);
   await waitFor(() => envelopes.some(body => body.includes('Gengar: reward ledger is haunted')) && envelopes.some(body => body.includes('"type":"transaction"')) && envelopes.some(body => body.includes('"type":"log"')), 15000);
   const events = envelopes.flatMap(body => body.split('\n').flatMap(line => { try { return [JSON.parse(line)]; } catch { return []; } }));
   const transactions = events.filter(event => event.type === 'transaction' && event.contexts?.trace);

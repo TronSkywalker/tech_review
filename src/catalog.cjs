@@ -16,6 +16,7 @@ const graph = {
   squirtle: ['jigglypuff', 'gengar'],
 };
 const scenarios = [
+  { id: 'loop', title: 'Come full circle', label: 'Random service loop', description: 'Pick a starting Pokémon. Each service calls a random other service until the starting Pokémon is reached again.', expectedStatus: 200 },
   { id: 'healthy', title: 'Launch an expedition', label: 'Distributed tracing', description: 'One request visits all ten services. Follow the parallel branches across projects.', expectedStatus: 200 },
   { id: 'slow', title: 'Wake up Snorlax', label: 'Slow dependency', description: 'Warehouse work takes 1.8 seconds. Find the bottleneck in the trace waterfall.', expectedStatus: 200 },
   { id: 'error', title: 'Haunt the delivery', label: 'Error monitoring', description: 'Gengar throws an error. Watch it propagate through Squirtle and Pikachu.', expectedStatus: 502 },

@@ -89,6 +89,7 @@ SDK references: [Express setup](https://docs.sentry.io/platforms/javascript/guid
 
 | Dashboard scenario / endpoint | Expected behavior | What to inspect in Sentry |
 | --- | --- | --- |
+| `POST /api/run/loop` | HTTP 200, a random chain returns to its starting Pokémon | Nested HTTP spans, per-hop logs, and the final loop-closing call |
 | `POST /api/run/healthy` | HTTP 200, ten service calls | One distributed trace with parallel branches and custom spans |
 | `POST /api/run/slow` | HTTP 200, Snorlax waits 1.8 seconds | The warehouse span dominates the critical path |
 | `POST /api/run/error` | HTTP 502, Gengar throws | Root exception in Gengar, downstream errors in Squirtle and Pikachu, trace-linked logs |
@@ -112,6 +113,18 @@ Dashboard → Adapter → Pikachu (coordinator, 4101)
 ```
 
 The adapter also exposes `GET /api/catalog` and `GET /api/health`. Every process exposes `GET /health`; each Pokémon exposes `GET /work/:scenario`. Unknown scenarios return HTTP 400. Downstream calls time out after six seconds and return a visible error node.
+
+### Random loop
+
+Choose **Come full circle** on the dashboard and select a starting Pokémon. Or call `POST /api/run/loop` with JSON `{"service":"eevee"}` (defaults to Pikachu). You can also start directly at any Pokémon using its `GET /work/loop` endpoint, for example `http://localhost:4105/work/loop` when running locally. Container ports are internal in Docker; use the adapter on port 3000.
+
+Each Pokémon randomly chooses any other Pokémon and makes a real HTTP call. Intermediate Pokémon can repeat. When the starting Pokémon is called again, it records `loop.closed: true` and returns without making another call. The response tree includes that final repeated Pokémon, and its `loop.path` contains the full route. Each hop and loop closure also emit structured Sentry logs in the same distributed trace.
+
+After 20 visits without returning, the next call is forced back to the origin (at most 21 service calls including closure). A dependency failure ends the request with an error tree. This bounds the demonstration while preserving a real loop such as `eevee → gengar → squirtle → eevee`.
+
+```powershell
+Invoke-RestMethod -Method Post http://localhost:3000/api/run/loop -ContentType 'application/json' -Body '{"service":"eevee"}'
+```
 
 ```sh
 curl -X POST http://localhost:3000/api/run/error

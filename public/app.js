@@ -5,7 +5,7 @@ function element(tag, className, content) {
   if (content !== undefined) node.textContent = content;
   return node;
 }
-const icons = ['↗', '◷', 'ϟ', '◎', '⋮'];
+const icons = ['↻', '↗', '◷', 'ϟ', '◎', '⋮'];
 let catalog;
 async function refreshHealth() {
   $('#refresh').disabled = true;
@@ -39,6 +39,8 @@ function treeView(node, total) {
   bar.append(fill);
   row.append(element('b', '', node.service), element('span', 'status', node.status), bar, element('span', 'duration', `${node.durationMs} ms`));
   li.append(row);
+  if (node.loop?.closed) li.append(element('p', 'node-message', `↻ Loop closed: ${node.loop.path.join(' → ')}`));
+  if (node.loop?.forcedReturn) li.append(element('p', 'node-message', '20 visits reached — returning to the starting Pokémon.'));
   if (node.error || node.warning) li.append(element('p', 'node-message', node.error || node.warning));
   if (node.children.length) {
     const ul = element('ul');
@@ -51,7 +53,10 @@ async function run(scenario) {
   document.querySelectorAll('.run').forEach(button => button.disabled = true);
   $('#run-status').textContent = `Running ${scenario.title.toLowerCase()}…`;
   try {
-    const response = await fetch(`/api/run/${scenario.id}`, { method: 'POST' });
+    const response = await fetch(`/api/run/${scenario.id}`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(scenario.id === 'loop' ? { service: $('#loop-start').value } : {}),
+    });
     const result = await response.json();
     if (!result.tree) throw new Error(result.error || 'Invalid adapter response');
     $('#empty').hidden = true;
@@ -82,6 +87,17 @@ async function init() {
       button.append(element('span', '', '↗'));
       button.addEventListener('click', () => run(scenario));
       card.append(element('div', 'icon', icons[index]), element('div', 'label', scenario.label), element('h3', '', scenario.title), element('p', '', scenario.description), button);
+      if (scenario.id === 'loop') {
+        const select = element('select', 'run');
+        select.id = 'loop-start';
+        select.setAttribute('aria-label', 'Starting Pokémon');
+        select.append(...catalog.services.map(service => {
+          const option = element('option', '', service.name);
+          option.value = service.name;
+          return option;
+        }));
+        card.insertBefore(select, button);
+      }
       return card;
     }));
     $('#refresh').addEventListener('click', refreshHealth);
